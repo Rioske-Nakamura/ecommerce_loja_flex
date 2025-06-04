@@ -1,99 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ecommerce</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-commerce - Carrinho</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-    <header>
-    <nav>
-        <h1>
-            Ecommerce
-        </h1>
-        
-        <nav>
-            <ul>
-                <li><a>Home</a></li>
-            </ul>
-            <ul>
-                <li><a>Cadastro</a></li>
-                <li><a>Carrinho</a></li>
-                <li><a>Produtos</a></li>
-            </ul>
-        </nav>
-    </nav>
-    </header>
+    {% include './components/navbar.html' %}
 
-    <main>
+    <main class="cart-container">
+        <h1 class="cart-title">🛒 Seu Carrinho</h1>
 
-                <h1>Carrinho</h1>
-        <div>
-
-            <div>
-                <img src="" alt="">
-                <div>
-                    <h1>Tema</h1>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus corporis accusantium veritatis minus velit repellat corrupti enim nemo repellendus quod beatae sit omnis iure ut libero accusamus, deserunt vitae. Praesentium.</p>
-                    <p>Preço: 12,34</p>
+        <section class="cart-items">
+            {% for item in carrinho %}
+            <div class="cart-item">
+                <img src="{{ item.imagem }}" alt="Imagem do Produto">
+                <div class="item-details">
+                    <h2>{{ item.nome }}</h2>
+                    <p>{{ item.descricao }}</p>
+                    <p class="price">Preço: R$ {{ item.preco }}</p>
+                    <div class="item-actions">
+                        <form method="POST" action="/comprar/{{ item.id }}">
+                            <button type="submit" class="btn buy">Comprar</button>
+                        </form>
+                        <form method="POST" action="/remover/{{ item.id }}">
+                            <button type="submit" class="btn remove">Remover</button>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div>
-                <button>Comprar</button>
-                <button>Tirar do Carrinho</button>
-            </div>
-            </div>
-            <div>
-                <img src="" alt="">
-                <div>
-                    <h1>Tema</h1>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus corporis accusantium veritatis minus velit repellat corrupti enim nemo repellendus quod beatae sit omnis iure ut libero accusamus, deserunt vitae. Praesentium.</p>
-                    <p>Preço: 12,34</p>
-            </div>
-            <div>
-                <button>Comprar</button>
-                <button>Tirar do Carrinho</button>
-            </div>
-            </div>
-            <div>
-                <img src="" alt="">
-                <div>
-                    <h1>Tema</h1>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus corporis accusantium veritatis minus velit repellat corrupti enim nemo repellendus quod beatae sit omnis iure ut libero accusamus, deserunt vitae. Praesentium.</p>
-                    <p>Preço: 12,34</p>
-            </div>
-            <div>
-                <button>Comprar</button>
-                <button>Tirar do Carrinho</button>
-            </div>
-            </div>
-            <div>
-                <img src="" alt="">
-                <div>
-                    <h1>Tema</h1>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus corporis accusantium veritatis minus velit repellat corrupti enim nemo repellendus quod beatae sit omnis iure ut libero accusamus, deserunt vitae. Praesentium.</p>
-                    <p>Preço: 12,34</p>
-            </div>
-            <div>
-                <button>Comprar</button>
-                <button>Tirar do Carrinho</button>
-            </div>
-            </div>
-            
-            
-           
-            
-        </div>
-        
-        
-
+            {% else %}
+            <p class="empty-cart">Seu carrinho está vazio.</p>
+            {% endfor %}
+        </section>
     </main>
-    <footer>
-    <img/>
-    <img/>
-    <img/>
-    <img/>
-    <img/>
-</footer>
+
+    {% include './components/footer.html' %}
+
 </body>
 </html>
