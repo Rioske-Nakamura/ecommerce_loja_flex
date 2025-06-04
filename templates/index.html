@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ecommerce</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+    {% include './components/navbar.html' %}
+
+    <main>
+        <section class="carousel">
+  <div class="slides">
+    <img src="https://centraldovarejo.com.br/wp-content/uploads/2024/02/Posso-comprar-na-Shopee-para-revender-no-Brasil-1000x600.png" alt="Slide 1" />
+    <img src="https://assets.aboutamazon.com/dims4/default/b4044b7/2147483647/strip/true/crop/1997x1124+2+0/resize/1240x698!/quality/90/?url=https%3A%2F%2Famazon-blogs-brightspot.s3.amazonaws.com%2F72%2Ff4%2Fd10f8d2a4017af630cf63b3521fc%2Fhero-002-amazon-delivery-3-copy.jpeg" alt="Slide 2" />
+    <img src="https://assets.multiplan.com.br/Multiplan/filer_public/0b/35/0b35ef4d-85be-4298-94ad-f0db73baf1a5/lojas_americanas_4_3.webp" alt="Slide 3" />
+  </div>
+</section>
+
+
+<section class="curiosities">
+    
+
+    <article class="curiosity-item style5">
+        <img src="https://tec.mx/sites/default/files/styles/rectangular/public/repositorio/TECStore/tienda-toluca-tec-store-tec-de-monterrey.jpg?itok=zBht75eO" alt="Imagem Pet Store">
+        <div class="curiosity-text">
+            <h2>Pet Store</h2>
+            
+            <p>Tudo para seu pet: rações, brinquedos e acessórios.</p>
+            <a href="/pet-store" class="btn">Entrar</a>
+        </div>
+        
+    </article>
+    <article class="curiosity-item style5">
+        <img src="https://tec.mx/sites/default/files/styles/rectangular/public/repositorio/TECStore/tienda-toluca-tec-store-tec-de-monterrey.jpg?itok=zBht75eO" alt="Imagem Pet Store">
+        <div class="curiosity-text">
+            <h2>Pet Store</h2>
+            
+            <p>Tudo para seu pet: rações, brinquedos e acessórios.</p>
+            <a href="/pet-store" class="btn">Entrar</a>
+        </div>
+        
+    </article>
+    <article class="curiosity-item style5">
+        <img src="https://tec.mx/sites/default/files/styles/rectangular/public/repositorio/TECStore/tienda-toluca-tec-store-tec-de-monterrey.jpg?itok=zBht75eO" alt="Imagem Pet Store">
+        <div class="curiosity-text">
+            <h2>Pet Store</h2>
+            
+            <p>Tudo para seu pet: rações, brinquedos e acessórios.</p>
+            <a href="/pet-store" class="btn">Entrar</a>
+        </div>
+        
+    </article>
+    <article class="curiosity-item style5">
+        <img src="https://tec.mx/sites/default/files/styles/rectangular/public/repositorio/TECStore/tienda-toluca-tec-store-tec-de-monterrey.jpg?itok=zBht75eO" alt="Imagem Pet Store">
+        <div class="curiosity-text">
+            <h2>Pet Store</h2>
+            
+            <p>Tudo para seu pet: rações, brinquedos e acessórios.</p>
+            <a href="/pet-store" class="btn">Entrar</a>
+        </div>
+        
+    </article>
+    <article class="curiosity-item style5">
+        <img src="https://tec.mx/sites/default/files/styles/rectangular/public/repositorio/TECStore/tienda-toluca-tec-store-tec-de-monterrey.jpg?itok=zBht75eO" alt="Imagem Pet Store">
+        <div class="curiosity-text">
+            <h2>Pet Store</h2>
+            
+            <p>Tudo para seu pet: rações, brinquedos e acessórios.</p>
+            <a href="/pet-store" class="btn">Entrar</a>
+        </div>
+        
+    </article>
+</section>
+
+
+    </main>
+
+    <footer>
+        <img src="https://via.placeholder.com/50" alt="Logo1"/>
+        <img src="https://via.placeholder.com/50" alt="Logo2"/>
+        <img src="https://via.placeholder.com/50" alt="Logo3"/>
+        <img src="https://via.placeholder.com/50" alt="Logo4"/>
+        <img src="https://via.placeholder.com/50" alt="Logo5"/>
+    </footer>
+
+    <script>
+        const toggle = document.getElementById('theme-toggle');
+        toggle.addEventListener('change', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+    </script>
+
+</body>
+</html>
