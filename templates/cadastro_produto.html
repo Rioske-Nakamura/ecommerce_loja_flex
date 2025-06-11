@@ -1,0 +1,16 @@
+{% include './components/navbar.html' %}
+<h2>Cadastro de Produto</h2>
+<form method="POST">
+    <input name="nome" type="text" placeholder="Nome do Produto" required>
+    <input name="descricao" type="text" placeholder="Descrição">
+    <input name="preco" type="number" step="0.01" placeholder="Preço" required>
+    <input name="imagem" type="text" placeholder="URL da Imagem">
+    {% if lojas %}
+        <select name="loja_id">
+            {% for loja in lojas %}
+                <option value="{{ loja.id }}">{{ loja.nome }}</option>
+            {% endfor %}
+        </select>
+    {% endif %}
+    <button type="submit">Cadastrar Produto</button>
+</form>

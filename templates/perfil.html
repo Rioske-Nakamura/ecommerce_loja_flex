@@ -1,0 +1,8 @@
+{% include './components/navbar.html' %}
+<h2>Perfil de {{ usuario.nome }}</h2>
+<p>Tipo: {{ usuario.tipo }}</p>
+{% if usuario.tipo == 'adm' %}
+    <a href="/gerenciar_usuarios">Gerenciar Usuários</a>
+    <a href="/gerenciar_lojas">Gerenciar Lojas</a>
+    <a href="/gerenciar_produtos">Gerenciar Produtos</a>
+{% endif %}

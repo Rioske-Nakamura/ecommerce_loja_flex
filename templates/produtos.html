@@ -26,6 +26,20 @@
     </nav>
     </header>
 
+
+    {% include './components/navbar.html' %}
+<h2>Produtos Disponíveis</h2>
+{% for produto in produtos %}
+    <div>
+        <h3>{{ produto.nome }}</h3>
+        <p>{{ produto.descricao }}</p>
+        <p>Preço: R$ {{ produto.preco }}</p>
+        <form method="POST" action="/adicionar_carrinho/{{ produto.id }}">
+            <input type="number" name="quantidade" value="1" min="1">
+            <button type="submit">Adicionar ao Carrinho</button>
+        </form>
+    </div>
+{% endfor %}
     <main>
         <div>
             <input/>

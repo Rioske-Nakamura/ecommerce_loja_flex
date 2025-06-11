@@ -28,7 +28,12 @@
 
     <main>
 
-        
+        {% include './components/navbar.html' %}
+<h2>Cadastro de Loja</h2>
+<form method="POST">
+    <input name="nome" type="text" placeholder="Nome da Loja" required>
+    <button type="submit">Cadastrar Loja</button>
+</form>
 
     </main>
     <footer>
