@@ -1,18 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <body>
- {% include './components/navbar.html' %}
-<h2>Login</h2>
-<form method="POST">
-    <input name="email" type="email" placeholder="Email" required>
-    <input name="senha" type="password" placeholder="Senha" required>
-    <button type="submit">Entrar</button>
-</form>
+    {% include './components/navbar.html' %}
+    <div class="main">    <div class="form">
+    
+    <h2>Login</h2>
+    <form method="POST">
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="senha" type="password" placeholder="Senha" required>
+        <button type="submit">Entrar</button>
+    </form>
+    </div>
+    </div>
 
+    {% if mensagem %}
+        <p style="color:red">{{ mensagem }}</p>
+    {% endif %}
+
+    {% include './components/footer.html' %}
 </body>
 </html>

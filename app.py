@@ -1,110 +1,147 @@
 # app.py
-from flask import Flask, render_template, request, redirect, session, url_for
-from functools import wraps
-import os
-from banco import (
-    criar_usuario, autenticar_usuario, criar_loja, listar_lojas,
-    criar_produto, listar_produtos
-)
+from flask import Flask, render_template, request, redirect, url_for, session
+from banco import *
 
 app = Flask(__name__)
-app.secret_key = 'sua_chave_secreta'
-
-# Decoradores para controle de acesso
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'usuario_id' not in session:
-            return redirect('/login')
-        return f(*args, **kwargs)
-    return decorated_function
-
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session.get('tipo') != 'adm':
-            return redirect('/')
-        return f(*args, **kwargs)
-    return decorated_function
-
-def vendedor_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session.get('tipo') != 'vendedor':
-            return redirect('/')
-        return f(*args, **kwargs)
-    return decorated_function
+app.secret_key = 'segredo123'
 
 @app.route('/')
 def index():
-    produtos = listar_produtos(ativos=True)
+    produtos = listar_produtos()
     return render_template('index.html', produtos=produtos)
 
-@app.route('/cadastro_usuario', methods=['GET', 'POST'])
-def cadastro_usuario():
-    if request.method == 'POST':
-        nome = request.form['nome']
-        email = request.form['email']
-        senha = request.form['senha']
-        criar_usuario(nome, email, senha)
-        return redirect('/login')
-    return render_template("/auth/cadastro_usuario.html")
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from banco import autenticar_usuario, Usuario, Session
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        senha = request.form['senha']
+    mensagem = ""
+    if request.method == "POST":
+        email = request.form["email"]
+        senha = request.form["senha"]
         usuario = autenticar_usuario(email, senha)
-        if usuario:
-            session['usuario_id'] = usuario.id
-            session['tipo'] = usuario.tipo
-            return redirect('/')
-    return render_template("/auth/login.html")
 
-@app.route('/logout')
+        if usuario:
+            session["usuario_id"] = usuario.id
+            session["usuario_nome"] = usuario.nome
+            session["usuario_tipo"] = usuario.tipo
+            return redirect(url_for("index"))  # redireciona após login
+        else:
+            mensagem = "❌ Email ou senha incorretos."
+
+    return render_template("/auth/login.html", mensagem=mensagem)
+
+
+@app.route("/logout")
 def logout():
     session.clear()
-    return redirect('/')
+    return redirect(url_for("login"))
 
-@app.route('/cadastro_loja', methods=['GET', 'POST'])
-@login_required
-def cadastro_loja():
+
+@app.route("/cadastro", methods=["GET", "POST"])
+def cadastro():
+    mensagem = ""
+    if request.method == "POST":
+        nome = request.form["nome"]
+        email = request.form["email"]
+        senha = request.form["senha"]
+        tipo = request.form["tipo"]
+
+        session = Session()
+        usuario_existente = session.query(Usuario).filter_by(email=email).first()
+
+        if usuario_existente:
+            mensagem = "⚠️ Este email já está cadastrado. Tente outro."
+        else:
+            novo = Usuario(nome=nome, email=email, senha=senha, tipo=tipo)
+            session.add(novo)
+            session.commit()
+            session.close()
+            return redirect(url_for("login"))  # ou para onde desejar após cadastro
+
+        session.close()
+
+    return render_template("/auth/cadastro_usuario.html", mensagem=mensagem)
+
+
+@app.route('/produto/<int:produto_id>/carrinho')
+def adicionar_carrinho(produto_id):
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+    usuario_id = session['usuario']['id']
+    adicionar_ao_carrinho(usuario_id, produto_id)
+    return redirect(url_for('carrinho'))
+
+@app.route('/carrinho')
+def carrinho():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+    itens = listar_carrinho(session['usuario']['id'])
+    return render_template('carrinho.html', itens=itens)
+
+@app.route('/finalizar')
+def finalizar():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+    finalizar_compra(session['usuario']['id'])
+    return redirect(url_for('index'))
+
+@app.route('/pedidos')
+def pedidos():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+    session_db = Session()
+    pedidos = session_db.query(Pedido).filter_by(cliente_id=session['usuario']['id']).all()
+    session_db.close()
+    return render_template('pedidos.html', pedidos=pedidos)
+
+@app.route('/pedido/<int:pedido_id>/status', methods=['POST'])
+def atualizar_status(pedido_id):
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+    novo_status = request.form['status']
+    usuario = Session().query(Usuario).get(session['usuario']['id'])
+    alterar_status_pedido(pedido_id, usuario, novo_status)
+    return redirect(url_for('pedidos'))
+
+@app.route('/minhas_lojas')
+def minhas_lojas():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+    lojas = listar_lojas(session['usuario']['id'])
+    return render_template('minhas_lojas.html', lojas=lojas)
+
+@app.route('/loja/nova', methods=['GET', 'POST'])
+def nova_loja():
     if request.method == 'POST':
-        nome = request.form['nome']
-        dono_id = session['usuario_id']
-        criar_loja(nome=nome, dono_id=dono_id)
-        return redirect('/')
-    return render_template("cadastro_loja.html")
+        criar_loja(
+            nome=request.form['nome'],
+            dono_id=session['usuario']['id'],
+            CNPJ=request.form.get('cnpj'),
+            descricao=request.form.get('descricao'),
+            ramo=request.form.get('ramo')
+        )
+        return redirect(url_for('minhas_lojas'))
+    return render_template('nova_loja.html')
 
-@app.route('/cadastro_produto', methods=['GET', 'POST'])
-@login_required
-def cadastro_produto():
-    tipo = session['tipo']
-    usuario_id = session['usuario_id']
-    lojas = listar_lojas(usuario_id if tipo == 'vendedor' else None)
+@app.route('/loja/<int:loja_id>/produtos')
+def produtos_loja(loja_id):
+    session_db = Session()
+    produtos = session_db.query(Produto).filter_by(loja_id=loja_id).all()
+    session_db.close()
+    return render_template('produtos_loja.html', produtos=produtos, loja_id=loja_id)
 
+@app.route('/produto/novo/<int:loja_id>', methods=['GET', 'POST'])
+def novo_produto(loja_id):
     if request.method == 'POST':
-        nome = request.form['nome']
-        descricao = request.form['descricao']
-        preco = float(request.form['preco'])
-        imagem = request.form['imagem']
-        loja_id = int(request.form['loja_id'])
-        criar_produto(nome, descricao, preco, loja_id, imagem)
-        return redirect('/')
-
-    return render_template("cadastro_produto.html", lojas=lojas)
-
-@app.route('/produtos')
-def listar_produtos_view():
-    produtos = listar_produtos(ativos=False)
-    return render_template("produtos.html", produtos=produtos)
-
-@app.route('/verificar')
-def verificar():
-    from banco import Base, engine
-    insp = engine.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
-    return "<br>".join([t[0] for t in insp])
+        criar_produto(
+            nome=request.form['nome'],
+            descricao=request.form['descricao'],
+            preco=float(request.form['preco']),
+            loja_id=loja_id
+        )
+        return redirect(url_for('produtos_loja', loja_id=loja_id))
+    return render_template('novo_produto.html', loja_id=loja_id)
 
 if __name__ == '__main__':
     app.run(debug=True)
