@@ -24,57 +24,19 @@
 
 <section class="curiosities">
     
+     {% for loja in lojas %}
+    <article class="curiosity-item style5">
+        <img src="https://tec.mx/sites/default/files/styles/rectangular/public/repositorio/TECStore/tienda-toluca-tec-store-tec-de-monterrey.jpg?itok=zBht75eO" alt="Imagem Pet Store">
+        <div class="curiosity-text">
+            <h3>{{ loja.nome }}</h3>
+            <p><strong>Ramo:</strong> {{ loja.ramo or "Não informado" }}</p>
+             <p>{{ loja.descricao or "Sem descrição." }}</p>
+             <a class="btn" href="/loja/{{ loja.id }}/produtos">Ver produtos</a>
+        </div>
+        
+    </article>
+    {% endfor %}
 
-    <article class="curiosity-item style5">
-        <img src="https://tec.mx/sites/default/files/styles/rectangular/public/repositorio/TECStore/tienda-toluca-tec-store-tec-de-monterrey.jpg?itok=zBht75eO" alt="Imagem Pet Store">
-        <div class="curiosity-text">
-            <h2>Pet Store</h2>
-            
-            <p>Tudo para seu pet: rações, brinquedos e acessórios.</p>
-            <a href="/pet-store" class="btn">Entrar</a>
-        </div>
-        
-    </article>
-    <article class="curiosity-item style5">
-        <img src="https://tec.mx/sites/default/files/styles/rectangular/public/repositorio/TECStore/tienda-toluca-tec-store-tec-de-monterrey.jpg?itok=zBht75eO" alt="Imagem Pet Store">
-        <div class="curiosity-text">
-            <h2>Pet Store</h2>
-            
-            <p>Tudo para seu pet: rações, brinquedos e acessórios.</p>
-            <a href="/pet-store" class="btn">Entrar</a>
-        </div>
-        
-    </article>
-    <article class="curiosity-item style5">
-        <img src="https://tec.mx/sites/default/files/styles/rectangular/public/repositorio/TECStore/tienda-toluca-tec-store-tec-de-monterrey.jpg?itok=zBht75eO" alt="Imagem Pet Store">
-        <div class="curiosity-text">
-            <h2>Pet Store</h2>
-            
-            <p>Tudo para seu pet: rações, brinquedos e acessórios.</p>
-            <a href="/pet-store" class="btn">Entrar</a>
-        </div>
-        
-    </article>
-    <article class="curiosity-item style5">
-        <img src="https://tec.mx/sites/default/files/styles/rectangular/public/repositorio/TECStore/tienda-toluca-tec-store-tec-de-monterrey.jpg?itok=zBht75eO" alt="Imagem Pet Store">
-        <div class="curiosity-text">
-            <h2>Pet Store</h2>
-            
-            <p>Tudo para seu pet: rações, brinquedos e acessórios.</p>
-            <a href="/pet-store" class="btn">Entrar</a>
-        </div>
-        
-    </article>
-    <article class="curiosity-item style5">
-        <img src="https://tec.mx/sites/default/files/styles/rectangular/public/repositorio/TECStore/tienda-toluca-tec-store-tec-de-monterrey.jpg?itok=zBht75eO" alt="Imagem Pet Store">
-        <div class="curiosity-text">
-            <h2>Pet Store</h2>
-            
-            <p>Tudo para seu pet: rações, brinquedos e acessórios.</p>
-            <a href="/pet-store" class="btn">Entrar</a>
-        </div>
-        
-    </article>
 </section>
 
 

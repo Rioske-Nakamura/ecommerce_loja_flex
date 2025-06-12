@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecommerce</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    
+
+
+        {% include './components/navbar.html' %}
+         <div class="main">    <div class="form">
+<h2>Cadastrar Nova Loja</h2>
+        <form action="{{ url_for('nova_loja') }}" method="POST" class="form">
+            <label for="nome">Nome da Loja:</label>
+            <input type="text" id="nome" name="nome" required>
+
+            <label for="cnpj">CNPJ:</label>
+            <input type="text" id="cnpj" name="cnpj">
+
+            <label for="descricao">Descrição:</label>
+            <textarea id="descricao" name="descricao" rows="4"></textarea>
+
+            <label for="ramo">Ramo:</label>
+            <input type="text" id="ramo" name="ramo">
+
+            <button type="submit" class="btn">Cadastrar</button>
+        </form>
+
+    </main>
+    </div></div>
+     {% include './components/footer.html' %}
+</body>
+</html>

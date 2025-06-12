@@ -8,7 +8,8 @@ app.secret_key = 'segredo123'
 @app.route('/')
 def index():
     produtos = listar_produtos()
-    return render_template('index.html', produtos=produtos)
+    lojas = listar_lojas() 
+    return render_template('index.html', produtos=produtos, lojas=lojas)
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from banco import autenticar_usuario, Usuario, Session
@@ -22,9 +23,8 @@ def login():
         usuario = autenticar_usuario(email, senha)
 
         if usuario:
-            session["usuario_id"] = usuario.id
-            session["usuario_nome"] = usuario.nome
-            session["usuario_tipo"] = usuario.tipo
+            session["usuario"] = usuario.to_dict()
+
             return redirect(url_for("index"))  # redireciona após login
         else:
             mensagem = "❌ Email ou senha incorretos."
@@ -109,11 +109,14 @@ def minhas_lojas():
     if 'usuario' not in session:
         return redirect(url_for('login'))
     lojas = listar_lojas(session['usuario']['id'])
-    return render_template('minhas_lojas.html', lojas=lojas)
+    return render_template('/sale/minhas_lojas.html', lojas=lojas)
 
 @app.route('/loja/nova', methods=['GET', 'POST'])
 def nova_loja():
     if request.method == 'POST':
+        if 'usuario' not in session:
+            return redirect(url_for('login'))
+
         criar_loja(
             nome=request.form['nome'],
             dono_id=session['usuario']['id'],
@@ -122,7 +125,7 @@ def nova_loja():
             ramo=request.form.get('ramo')
         )
         return redirect(url_for('minhas_lojas'))
-    return render_template('nova_loja.html')
+    return render_template('/sale/cadastro_loja.html')
 
 @app.route('/loja/<int:loja_id>/produtos')
 def produtos_loja(loja_id):
@@ -141,7 +144,7 @@ def novo_produto(loja_id):
             loja_id=loja_id
         )
         return redirect(url_for('produtos_loja', loja_id=loja_id))
-    return render_template('novo_produto.html', loja_id=loja_id)
+    return render_template('cadastro_produto.html', loja_id=loja_id)
 
 if __name__ == '__main__':
     app.run(debug=True)
