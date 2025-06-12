@@ -7,7 +7,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-
+    <!-- templates/carrinho.html -->
+{% include './components/navbar.html' %}
+<h2>Seu Carrinho</h2>
+{% for item in carrinho %}
+    <div>
+        <p>{{ item.nome }} ({{ item.quantidade }}) - R$ {{ item.preco }}</p>
+    </div>
+{% endfor %}
+<a href="/finalizar_compra">Finalizar Compra</a>
     {% include './components/navbar.html' %}
 
     <main class="cart-container">

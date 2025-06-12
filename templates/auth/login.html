@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    {% include './components/navbar.html' %}
+    <div class="main">    <div class="form">
+    
+    <h2>Login</h2>
+    <form method="POST">
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="senha" type="password" placeholder="Senha" required>
+        <button type="submit">Entrar</button>
+    </form>
+    </div>
+    </div>
+
+    {% if mensagem %}
+        <p style="color:red">{{ mensagem }}</p>
+    {% endif %}
+
+    {% include './components/footer.html' %}
+</body>
+</html>
