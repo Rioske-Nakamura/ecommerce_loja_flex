@@ -591,6 +591,10 @@ body.dark-mode .price {
 
 }
 
+.form a{
+    color: rgb(36, 125, 167);
+}
+
 body.dark-mode .form {
     background-color: #f0f0f0;
     box-shadow: 0 4px 12px rgba(128, 0, 128, 0.1);
@@ -605,8 +609,15 @@ body.dark-mode .form {
 
 body.dark-mode .form label {
     color: #800080;
+  
+}
+.form a{
+    color: #adff2f;
 }
 
+body.dark-mode .form a{
+    color: #800080;
+}
 .form input,
 .form textarea,
 .form select {
