@@ -1,44 +1,35 @@
-from sqlalchemy import Column, Integer, String, DateTime, Float,create_engine,  Boolean, ForeignKey
-from sqlalchemy.orm import sessionmaker, declarative_base
+# banco.py
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base, relationship, scoped_session
 
-db =  create_engine("sqlite:///banco.db")
-Session =   sessionmaker(bind=db)
-session =  Session()
+# Configuração do banco
+engine = create_engine("sqlite:///banco.db", echo=False)
+Session = scoped_session(sessionmaker(bind=engine))
+Base = declarative_base()
 
-Base  = declarative_base()
+# Modelos
 
 class Loja(Base):
     __tablename__ = "lojas"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    nome =  Column(String, unique=True )
-    CNPJ = Column(String, unique=True )
-    descricao =  Column(String )
-    ramo = Column(String)
+    nome = Column(String, unique=True)
+    CNPJ = Column(String, unique=True, nullable=True)
+    descricao = Column(String, nullable=True)
+    ramo = Column(String, nullable=True)
+    dono_id = Column(Integer, ForeignKey("usuarios.id"), nullable=True)
 
-    def __init__ ( self, nome,CNPJ, descricao, ramo) :
-        
-        self.nome = nome
-        self.CNPJ = CNPJ
-        self.descricao = descricao
-        self.ramo = ramo
-
-
+    produtos = relationship("Produto", backref="loja", cascade="all, delete-orphan")
 
 class Usuario(Base):
     __tablename__ = "usuarios"
-    id = Column("id", Integer, primary_key=True, autoincrement=True)
-    nome = Column("nome", String)
-    email = Column("email", String, unique=True)
-    senha = Column("senha", String)
-    ativo = Column("ativo", Boolean)
-    tipo = Column("tipo", String)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nome = Column(String)
+    email = Column(String, unique=True)
+    senha = Column(String)
+    ativo = Column(Boolean, default=True)
+    tipo = Column(String)
 
-    def __init__(self, nome, email, senha, tipo, ativo=True):
-        self.nome = nome
-        self.email = email
-        self.senha = senha
-        self.ativo = ativo
-        self.tipo = tipo
+    lojas = relationship("Loja", backref="dono", cascade="all, delete-orphan")
 
     def to_dict(self):
         return {
@@ -49,35 +40,62 @@ class Usuario(Base):
             "ativo": self.ativo
         }
 
-    def __repr__(self):
-        return str(self.to_dict())
-
-
 class Produto(Base):
     __tablename__ = "produtos"
-    id =  Column('id', Integer, primary_key=True,autoincrement=True)
-    nome = Column("nome",String)
-    descricao = Column("descricao",String)
-    preco = Column("preco", Float)
-    dono = Column("dono", ForeignKey("lojas.id"))
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nome = Column(String)
+    descricao = Column(String)
+    preco = Column(Float)
+    imagem = Column(String, nullable=True)
+    status = Column(String, default="ativo")
+    loja_id = Column(Integer, ForeignKey("lojas.id"))
 
-    def __init__(self, nome,descricao, preco, dono):
-        self.nome = nome
-        self.descricao = descricao
-        self.preco = preco
-        self.dono =  dono 
+# Cria tabelas
+Base.metadata.create_all(bind=engine)
 
-Base.metadata.create_all(bind=db)
+# Funções utilitárias
 
+def criar_usuario(nome, email, senha, tipo="cliente", ativo=True):
+    session = Session()
+    novo = Usuario(nome=nome, email=email, senha=senha, tipo=tipo, ativo=ativo)
+    session.add(novo)
+    session.commit()
+    session.close()
 
-#cria
-#usuarios =  Usuario(nome="Felipe", email="sql@gmail.com", senha="1234", tipo="")
-#session.add(usuarios)
-#session.commit()
+def autenticar_usuario(email, senha):
+    session = Session()
+    usuario = session.query(Usuario).filter_by(email=email, senha=senha).first()
+    session.close()
+    return usuario
 
+def criar_loja(nome, dono_id, CNPJ=None, descricao=None, ramo=None):
+    session = Session()
+    nova = Loja(nome=nome, dono_id=dono_id, CNPJ=CNPJ, descricao=descricao, ramo=ramo)
+    session.add(nova)
+    session.commit()
+    session.close()
 
-#puxa 
-lista_user = session.query(Usuario).all()
-print(lista_user)
-#lista_user = session.query(Usuario).all().filter_by()
-#lista_user = session.query(Usuario).all().first
+def listar_lojas(dono_id=None):
+    session = Session()
+    if dono_id:
+        lojas = session.query(Loja).filter_by(dono_id=dono_id).all()
+    else:
+        lojas = session.query(Loja).all()
+    session.close()
+    return lojas
+
+def criar_produto(nome, descricao, preco, loja_id, imagem=None, status="ativo"):
+    session = Session()
+    novo = Produto(nome=nome, descricao=descricao, preco=preco, loja_id=loja_id, imagem=imagem, status=status)
+    session.add(novo)
+    session.commit()
+    session.close()
+
+def listar_produtos(ativos=True):
+    session = Session()
+    if ativos:
+        produtos = session.query(Produto).filter_by(status="ativo").all()
+    else:
+        produtos = session.query(Produto).all()
+    session.close()
+    return produtos

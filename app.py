@@ -1,23 +1,14 @@
-# Estrutura inicial do app com banco e rotas principais
 # app.py
 from flask import Flask, render_template, request, redirect, session, url_for
-import sqlite3
 from functools import wraps
 import os
+from banco import (
+    criar_usuario, autenticar_usuario, criar_loja, listar_lojas,
+    criar_produto, listar_produtos
+)
 
 app = Flask(__name__)
 app.secret_key = 'sua_chave_secreta'
-
-db_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'ecommerce.db')
-print("Usando banco:", db_path)
-
-def get_db_connection():
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-def conectar():
-    return sqlite3.connect("banco.db")
 
 # Decoradores para controle de acesso
 def login_required(f):
@@ -46,18 +37,8 @@ def vendedor_required(f):
 
 @app.route('/')
 def index():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT p.id, p.nome, p.descricao, p.preco, p.imagem, l.nome AS loja_nome 
-        FROM produtos p 
-        LEFT JOIN lojas l ON p.loja_id = l.id 
-        WHERE p.status = 'ativo'
-    """)
-    produtos = cur.fetchall()
-    conn.close()
+    produtos = listar_produtos(ativos=True)
     return render_template('index.html', produtos=produtos)
-
 
 @app.route('/cadastro_usuario', methods=['GET', 'POST'])
 def cadastro_usuario():
@@ -65,12 +46,7 @@ def cadastro_usuario():
         nome = request.form['nome']
         email = request.form['email']
         senha = request.form['senha']
-
-        con = conectar()
-        cur = con.cursor()
-        cur.execute("INSERT INTO usuarios (nome, email, senha, tipo) VALUES (?, ?, ?, 'cliente')", (nome, email, senha))
-        con.commit()
-        con.close()
+        criar_usuario(nome, email, senha)
         return redirect('/login')
     return render_template("/auth/cadastro_usuario.html")
 
@@ -79,16 +55,10 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         senha = request.form['senha']
-
-        con = conectar()
-        cur = con.cursor()
-        cur.execute("SELECT id, tipo FROM usuarios WHERE email=? AND senha=?", (email, senha))
-        usuario = cur.fetchone()
-        con.close()
-
+        usuario = autenticar_usuario(email, senha)
         if usuario:
-            session['usuario_id'] = usuario[0]
-            session['tipo'] = usuario[1]
+            session['usuario_id'] = usuario.id
+            session['tipo'] = usuario.tipo
             return redirect('/')
     return render_template("/auth/login.html")
 
@@ -103,65 +73,38 @@ def cadastro_loja():
     if request.method == 'POST':
         nome = request.form['nome']
         dono_id = session['usuario_id']
-
-        con = conectar()
-        cur = con.cursor()
-        cur.execute("INSERT INTO lojas (nome, dono_id) VALUES (?, ?)", (nome, dono_id))
-        con.commit()
-        con.close()
+        criar_loja(nome=nome, dono_id=dono_id)
         return redirect('/')
     return render_template("cadastro_loja.html")
 
 @app.route('/cadastro_produto', methods=['GET', 'POST'])
 @login_required
 def cadastro_produto():
-    con = conectar()
-    cur = con.cursor()
-
-    if session['tipo'] == 'vendedor':
-        cur.execute("SELECT id, nome FROM lojas WHERE dono_id=?", (session['usuario_id'],))
-    elif session['tipo'] == 'adm':
-        cur.execute("SELECT id, nome FROM lojas")
-    else:
-        return redirect('/')
-
-    lojas = cur.fetchall()
+    tipo = session['tipo']
+    usuario_id = session['usuario_id']
+    lojas = listar_lojas(usuario_id if tipo == 'vendedor' else None)
 
     if request.method == 'POST':
         nome = request.form['nome']
         descricao = request.form['descricao']
-        preco = request.form['preco']
+        preco = float(request.form['preco'])
         imagem = request.form['imagem']
-        loja_id = request.form['loja_id']
-        status = 'ativo'
-
-        cur.execute("INSERT INTO produtos (nome, descricao, preco, imagem, loja_id, status) VALUES (?, ?, ?, ?, ?, ?)",
-                    (nome, descricao, preco, imagem, loja_id, status))
-        con.commit()
-        con.close()
+        loja_id = int(request.form['loja_id'])
+        criar_produto(nome, descricao, preco, loja_id, imagem)
         return redirect('/')
 
-    con.close()
     return render_template("cadastro_produto.html", lojas=lojas)
 
 @app.route('/produtos')
-def listar_produtos():
-    con = conectar()
-    cur = con.cursor()
-    cur.execute("SELECT p.id, p.nome, p.descricao, p.preco, p.imagem, l.nome FROM produtos p LEFT JOIN lojas l ON p.loja_id = l.id")
-    produtos = cur.fetchall()
-    con.close()
+def listar_produtos_view():
+    produtos = listar_produtos(ativos=False)
     return render_template("produtos.html", produtos=produtos)
 
 @app.route('/verificar')
 def verificar():
-    conn = sqlite3.connect("C:/Users/Service Desk/Documents/GitHub/ecommerce_loja_flex/ecommerce.db")
-    cur = conn.cursor()
-    cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    tabelas = cur.fetchall()
-    conn.close()
-    return "<br>".join([t[0] for t in tabelas])
-
+    from banco import Base, engine
+    insp = engine.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+    return "<br>".join([t[0] for t in insp])
 
 if __name__ == '__main__':
     app.run(debug=True)
