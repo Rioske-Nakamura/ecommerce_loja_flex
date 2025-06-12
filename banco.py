@@ -26,23 +26,32 @@ class Loja(Base):
 
 class Usuario(Base):
     __tablename__ = "usuarios"
-    id = Column("id",Integer, primary_key=True, autoincrement=True)
-    nome = Column("nome",String)
-    email = Column("email",String, unique=True)
-    senha =  Column("senha",String)
-    ativo = Column("ativo",Boolean)
-    tipo = Column("tipo",String)
-    #trabalha = Column("trabalha",ForeignKey("lojas.id"))
-    #produtos = Column("",String)
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
+    nome = Column("nome", String)
+    email = Column("email", String, unique=True)
+    senha = Column("senha", String)
+    ativo = Column("ativo", Boolean)
+    tipo = Column("tipo", String)
 
-    def __init__(self, nome, email, senha, tipo, ativo=True):	
+    def __init__(self, nome, email, senha, tipo, ativo=True):
         self.nome = nome
         self.email = email
         self.senha = senha
         self.ativo = ativo
         self.tipo = tipo
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "nome": self.nome,
+            "email": self.email,
+            "tipo": self.tipo,
+            "ativo": self.ativo
+        }
+
     def __repr__(self):
-        return  {"id" : self.id, "nome" : self.nome, "email": self.email, "tipo":self.tipo, "ativo":self.ativo}
+        return str(self.to_dict())
+
 
 class Produto(Base):
     __tablename__ = "produtos"
