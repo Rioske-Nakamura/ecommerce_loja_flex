@@ -113,9 +113,10 @@ def minhas_lojas():
 
 @app.route('/loja/nova', methods=['GET', 'POST'])
 def nova_loja():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
     if request.method == 'POST':
-        if 'usuario' not in session:
-            return redirect(url_for('login'))
+        
 
         criar_loja(
             nome=request.form['nome'],
@@ -144,7 +145,7 @@ def novo_produto(loja_id):
             loja_id=loja_id
         )
         return redirect(url_for('produtos_loja', loja_id=loja_id))
-    return render_template('cadastro_produto.html', loja_id=loja_id)
+    return render_template('/sale/cadastro_produto.html', loja_id=loja_id)
 
 if __name__ == '__main__':
     app.run(debug=True)
