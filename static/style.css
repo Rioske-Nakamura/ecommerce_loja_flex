@@ -573,7 +573,7 @@ body.dark-mode .price {
     }
 }
 
-.main{
+.main, main{
     min-height: 550px;
     max-height: auto;
 }
